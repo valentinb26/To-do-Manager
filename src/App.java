@@ -4,6 +4,7 @@ import java.util.Scanner;
 public class App {
 
     public static String[] validCMD = {"HELP","USER","CREATE","DELETE","SHOW","EXIT"};
+    //auf jedenfall String durch ganze richtige Objekte ersetzen
     public static ArrayList<String> toDoList = new ArrayList<>();
     static boolean var = true;
     static String SEPERATOR = "#################################################################";
@@ -12,8 +13,6 @@ public class App {
     public static void main(String[] args) throws Exception {
         FileIO fileIO = new FileIO();
         fileIO.importList();
-        
-        
         
         while (var) {
 
@@ -34,6 +33,10 @@ public class App {
                         continueCheck();
                         break;
                     case "USER":
+                    /* 
+                    die idee ist dass man sich einloggen kann (möglichkeit mit hash zu arbeiten o.ä)
+                    um mehrere listen und datein für mehrer nutzer hat (gast user als standard)
+                    */
                         System.out.println("WIP");
                         break;
                     case "CREATE":
@@ -48,6 +51,7 @@ public class App {
                                 System.out.println("Ups seems like there was a problem...");
                             }
                         }
+                        //frag ob man noch mehr erstellen will
                         continueCheck();
                         break;
 
@@ -57,6 +61,7 @@ public class App {
                         String userInputDelete = inputScanner.nextLine();
                         deleteFromList(userInputDelete);
                         fileIO.exportList();
+                        //frag ob man noch mehr löschen will
                         continueCheck();
                         break;  
 
@@ -69,6 +74,7 @@ public class App {
                         System.out.println("Goodbye");
                         var=false;
                         break; 
+                    //einen sort case oder eine sort option in show einbauen    
                     default:
                         break;
                 }
