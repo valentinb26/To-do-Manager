@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class FileIO {
     
-    String dataPath = "/Users/v/Desktop/repo/To-do-Manager/Data";
+    String dataPath = "/Users/v/Desktop/Github Rep/To-do-Manager/Data";
     String dataName = "/toDoList.txt";
     String dataFolder= "/toDoList";
     String fullPath = dataPath+dataName;
@@ -21,9 +21,10 @@ public void importList(){
         App.toDoList.add(data);
       }
       myReader.close();
-    } catch (FileNotFoundException e) {
-      if (e instanceof FileNotFoundException) {
+    } catch (Exception e) {
+      if (e instanceof IOException) {
         CreateFile();
+        System.out.println("File not found. A new file has been created.");
       } else {  
         System.out.println("An error occurred.");
         e.printStackTrace();
@@ -56,7 +57,7 @@ public void CreateFile() {
       //System.out.println("Directory already exists or could not be created.");
     }
   } catch (Exception e) {
-    System.out.println("An error occurred.");
+    System.out.println("An error occurred while creating the directory.");
     e.printStackTrace();
   }
   try {
@@ -66,8 +67,8 @@ public void CreateFile() {
     } else {
       //System.out.println("File already exists.");
       }
-    } catch (IOException e) {
-      System.out.println("An error occurred.");
+    } catch (Exception e) {
+      System.out.println("An error occurred while creating the file.");
       e.printStackTrace();
     }
   }
