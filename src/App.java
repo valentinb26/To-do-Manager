@@ -109,12 +109,13 @@ public class App {
      fileIO.exportList();
     }
 
-    // method to show the to-do list
+    // method to show the to-do list using an iterator
     public static void showList(){
         Iterator<Task> iterator = toDoList.iterator();
-
+        int i = 1;
         while (iterator.hasNext()) {
-            System.out.println(iterator.next());
+            System.out.println(i + ". " + iterator.next());
+            i++;
         }
     }
 
