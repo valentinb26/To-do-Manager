@@ -5,8 +5,8 @@ public class App {
 
     public static String[] validCMD = {"HELP","USER","CREATE","DELETE","SHOW","EXIT"};
     //auf jedenfall String durch ganze richtige Objekte ersetzen
-    public static ArrayList<String> toDoList = new ArrayList<>();
-    static boolean var = true;
+    public static ArrayList<Task> toDoList = new ArrayList<>();
+    static boolean run = true;
     static String SEPERATOR = "#################################################################";
     static Scanner inputScanner = new Scanner(System.in);
 
@@ -14,7 +14,7 @@ public class App {
         FileIO fileIO = new FileIO();
         fileIO.importList();
         
-        while (var) {
+        while (run) {
 
         System.out.println(SEPERATOR);
         System.out.println("Hello! What would you like to do? Type help if you need help");
@@ -40,17 +40,27 @@ public class App {
                         System.out.println("WIP");
                         break;
                     case "CREATE":
+                        Task newTask = new Task("","",false); //placeholder
                         System.out.println("Sure! Please enter the Name of your task.");
-                        String userInputTodoName = inputScanner.nextLine();
-                        toDoList.add(userInputTodoName);
+                        String userInputTaskDescription = inputScanner.nextLine();
+                        newTask.setDescription(userInputTaskDescription);
+                        System.out.println("Please enter the Owner of the task.");
+                        String userInputTaskOwner = inputScanner.nextLine();
+                        newTask.setOwner(userInputTaskOwner);
+                        toDoList.add(newTask);
+
+                        //todo: add check if sucessfull added task
+
+                        /* 
                         for (int j = 0; j < toDoList.size(); j++) {
-                            if (toDoList.get(j).equals(userInputTodoName) ) {
+                            if (toDoList.get(j).equals(userInputTaskDescription) ) {
                                 System.out.println("Succesfully added: " + toDoList.get(j));
                                 fileIO.exportList();
                             }else if (j == toDoList.size()-1) {
                                 System.out.println("Ups seems like there was a problem...");
                             }
                         }
+                            */
                         //frag ob man noch mehr erstellen will
                         continueCheck();
                         break;
@@ -67,12 +77,13 @@ public class App {
 
                     case "SHOW":
                         System.out.println("Sure! Let me show you your to-do's:");
+                        
                         showList();
                         continueCheck();
                         break;   
                     case "EXIT":
                         System.out.println("Goodbye");
-                        var=false;
+                        run=false;
                         break; 
                     //einen sort case oder eine sort option in show einbauen    
                     default:
@@ -98,30 +109,25 @@ public class App {
     }
 
     public static void deleteFromList(String removeable){
-        for (int i = 0; i < toDoList.size(); i++) {
-            if (toDoList.get(i).equals(removeable)) {
-                toDoList.remove(i);
-                if (!toDoList.contains(removeable)) {
-                    System.out.println("Deleted  " + removeable + "  successfully");
-                }else {
-                    System.out.println("Ups seems like something went wrong while deleting...");
-                } 
-            }else if (i == toDoList.size()-1) {
-                System.out.println("Hmm can't delete what I can't find...");
-            }
+        boolean removed = toDoList.removeIf(task -> task.getDescription().equals(removeable));
+        if (removed) {
+            System.out.println("Deleted  " + removeable + "  successfully");
+        } else {
+            System.out.println("Task not found: " + removeable);
         }
     }
 
     public static void continueCheck(){
+        String positiv = "Y";
         System.out.println("Would you like to continue ? Y/N");
         String answer = inputScanner.nextLine().toUpperCase();
-        if (answer.equals("N")) {
+        if (!answer.equals(positiv)) {
             System.out.println("Ok Goodbye.");
-            var = false;
-        }else if (answer.equals("Y")) {
-            var = true;
+            run = false;
+        }else if (answer.equals(positiv)) {
+            run = true;
         } else {
-            var = false;
+            run = false;
         }
     }
 

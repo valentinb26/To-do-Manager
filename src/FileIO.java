@@ -18,7 +18,11 @@ public void importList(){
       Scanner myReader = new Scanner(myObj);
       while (myReader.hasNextLine()) {
         String data = myReader.nextLine();
-        App.toDoList.add(data);
+        String[] parts = data.split(";");
+        String description = parts[0];
+        String owner = parts[1];
+        boolean isCompleted = Boolean.parseBoolean(parts[2]);
+        App.toDoList.add(new Task(description, owner, isCompleted));
       }
       myReader.close();
     } catch (Exception e) {
@@ -38,7 +42,11 @@ public void exportList(){
       FileWriter myWriter = new FileWriter(fullPath);
 
       for (int i = 0; i < App.toDoList.size(); i++) {
-        myWriter.write(App.toDoList.get(i) + System.lineSeparator());
+        myWriter.write(
+          App.toDoList.get(i).getDescription() + ";" + 
+          App.toDoList.get(i).getOwner() + ";" + 
+          App.toDoList.get(i).isCompleted() +
+          System.lineSeparator());
       }
       myWriter.close();
       //System.out.println("Successfully wrote to the file.");
