@@ -6,7 +6,6 @@ public class App {
     public static String[] validCMD = {"HELP","USER","CREATE","DELETE","SHOW","EXIT"};
     //auf jedenfall String durch ganze richtige Objekte ersetzen
     public static ArrayList<Task> toDoList = new ArrayList<>();
-    static boolean run = true;
     static String SEPERATOR = "#################################################################";
     static Scanner inputScanner = new Scanner(System.in);
 
@@ -14,7 +13,9 @@ public class App {
         FileIO fileIO = new FileIO();
         fileIO.importList();
         
-        while (run) {
+        boolean running = true;
+
+        while (running) {
 
         System.out.println(SEPERATOR);
         System.out.println("Hello! What would you like to do? Type help if you need help");
@@ -30,7 +31,7 @@ public class App {
                         for (int j = 0; j < validCMD.length; j++) {
                             System.out.println(validCMD[j]);
                         }
-                        continueCheck();
+                        running = continueCheck();
                         break;
                     case "USER":
                     /* 
@@ -62,7 +63,7 @@ public class App {
                         }
                             */
                         //frag ob man noch mehr erstellen will
-                        continueCheck();
+                        running = continueCheck();
                         break;
 
                     case "DELETE":
@@ -72,18 +73,18 @@ public class App {
                         deleteFromList(userInputDelete);
                         fileIO.exportList();
                         //frag ob man noch mehr löschen will
-                        continueCheck();
+                        running = continueCheck();
                         break;  
 
                     case "SHOW":
                         System.out.println("Sure! Let me show you your to-do's:");
                         
                         showList();
-                        continueCheck();
+                        running = continueCheck();
                         break;   
                     case "EXIT":
                         System.out.println("Goodbye");
-                        run=false;
+                        running = false;
                         break; 
                     //einen sort case oder eine sort option in show einbauen    
                     default:
@@ -92,7 +93,7 @@ public class App {
                 break;
             }else if (i == validCMD.length-1) {
                 System.out.println("Sorry I can't help you with that.");
-                continueCheck();
+                running = continueCheck();
             } 
         }
         }
@@ -117,18 +118,11 @@ public class App {
         }
     }
 
-    public static void continueCheck(){
-        String positiv = "Y";
-        System.out.println("Would you like to continue ? Y/N");
-        String answer = inputScanner.nextLine().toUpperCase();
-        if (!answer.equals(positiv)) {
-            System.out.println("Ok Goodbye.");
-            run = false;
-        }else if (answer.equals(positiv)) {
-            run = true;
-        } else {
-            run = false;
-        }
+    public static boolean continueCheck() {
+        System.out.println("Would you like to continue? Y/N");
+        String answer = inputScanner.nextLine().trim().toUpperCase();
+
+        return answer.equals("Y");
     }
 
 }
