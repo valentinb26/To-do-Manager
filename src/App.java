@@ -70,25 +70,34 @@ public class App {
 
                     case "DELETE":
                         // show list, ask which one to delete, delete from list
+                        // currently selecting via description, might delete multiple if same description
+
+                        // todo: unique IDs for tasks
+                        // todo: confirm before delete
+                        // todo: ask if wanting to delete more
+                        // inspiration: delete all completed tasks option
+
+                        // displays list with numbering so maybe user could select via number 
+                        // instead of description
                         System.out.println("Sure! Which following task would you like to delete?");
                         showList();
                         String userInputDelete = inputScanner.nextLine();
                         deleteFromList(userInputDelete);
                         fileIO.exportList();
-                        //inspiration: ask if wanting to delete more
                         running = continueCheck();
                         break;  
 
                     case "SHOW":
-                        //display all tasks
+                        // display all tasks
+                        // todo: sort options (owner, completed, etc)
                         System.out.println("Sure! Let me show you your to-do's:");
-                        
                         showList();
                         running = continueCheck();
                         break;   
-                        //inspiration: sort options
                     case "EXIT":
-                        //exit program
+                        // exit program
+                        // cleanup not needed since cleanup happens after 
+                        // switch but before while loop ends
                         System.out.println("Goodbye");
                         running = false;
                         break;     
@@ -97,7 +106,7 @@ public class App {
                 }
                 break;
             }else if (i == validCMD.length-1) {
-                //if command not recognized and run again
+                //if command not recognized will run again
                 System.out.println("Sorry I can't help you with that.");
                 running = continueCheck();
             } 
@@ -105,11 +114,12 @@ public class App {
         }
 
     //cleanup before exit
-     inputScanner.close();
-     fileIO.exportList();
+    inputScanner.close();
+    fileIO.exportList();
     }
 
     // method to show the to-do list using an iterator
+    // order depends on when tasks were added (1. is oldest)
     public static void showList(){
         Iterator<Task> iterator = toDoList.iterator();
         int i = 1;
