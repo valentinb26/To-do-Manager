@@ -15,7 +15,7 @@ public class App {
         SHOW,
         EXIT
     }
-    private static String SEPERATOR = "#################################################################";
+    private static final String SEPARATOR = "#################################################################";
 
     public static void main(String[] args) throws Exception {
         App app = new App();
@@ -30,7 +30,7 @@ public class App {
 
         while (running) {
 
-            System.out.println(SEPERATOR);
+            System.out.println(SEPARATOR);
             System.out.println("Hello! What would you like to do? Type help if you need help");
             String userInput = inputScanner.nextLine().toUpperCase(); 
 
