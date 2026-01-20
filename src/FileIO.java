@@ -1,20 +1,26 @@
 import java.io.File;
-//import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class FileIO {
+    private final Path dataDirectory;
+    private final Path dataFile;
     
-    String dataPath = "/Users/v/Desktop/Github Rep/To-do-Manager/Data";
-    String dataName = "/toDoList.txt";
-    String dataFolder= "/toDoList";
-    String fullPath = dataPath+dataName;
-    
+public FileIO() {
+  this.dataDirectory = Paths.get(
+      System.getProperty("user.home"),
+      "to-do-manager",
+      "data"
+  );
+  this.dataFile = dataDirectory.resolve("todoList.txt");
+    }
 
 public void importList(){
      try {
-      File myObj = new File(dataPath+dataName);
+      File myObj = new File(dataFile.toString());
       Scanner myReader = new Scanner(myObj);
       while (myReader.hasNextLine()) {
         String data = myReader.nextLine();
@@ -39,7 +45,7 @@ public void importList(){
 public void exportList(){ 
   CreateFile();
   try {
-      FileWriter myWriter = new FileWriter(fullPath);
+      FileWriter myWriter = new FileWriter(dataFile.toString());
 
       for (int i = 0; i < App.toDoList.size(); i++) {
         myWriter.write(
@@ -49,7 +55,7 @@ public void exportList(){
           System.lineSeparator());
       }
       myWriter.close();
-      //System.out.println("Successfully wrote to the file.");
+      System.out.println("Successfully wrote to the file.");
     } catch (IOException e) {
       System.out.println("An error occurred.");
       e.printStackTrace();
@@ -58,22 +64,22 @@ public void exportList(){
 
 public void CreateFile() {
   try {
-    File directory = new File(dataPath);
+    File directory = new File(dataDirectory.toString());
     if (directory.mkdir()) {
       System.out.println("Directory created: " + directory.getName());
     } else {
-      //System.out.println("Directory already exists or could not be created.");
+      System.out.println("Directory exists or could not be created.");
     }
   } catch (Exception e) {
     System.out.println("An error occurred while creating the directory.");
     e.printStackTrace();
   }
   try {
-    File myObj = new File(fullPath);
+    File myObj = new File(dataFile.toString());
     if (myObj.createNewFile()) {
       System.out.println("File created: " + myObj.getName());
     } else {
-      //System.out.println("File already exists.");
+      System.out.println("File exists.");
       }
     } catch (Exception e) {
       System.out.println("An error occurred while creating the file.");
