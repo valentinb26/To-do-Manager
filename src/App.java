@@ -4,11 +4,19 @@ import java.util.List;
 import java.util.Scanner;
 
 public class App {
+    public List<Task> toDoList = new ArrayList<>();
+    static Scanner inputScanner = new Scanner(System.in);
 
     public static String[] validCMD = {"HELP","USER","CREATE","DELETE","SHOW","EXIT"};
-    public List<Task> toDoList = new ArrayList<>();
+    public enum Command {
+        HELP,
+        USER,
+        CREATE,
+        DELETE,
+        SHOW,
+        EXIT
+    }
     static String SEPERATOR = "#################################################################";
-    static Scanner inputScanner = new Scanner(System.in);
 
     public static void main(String[] args) throws Exception {
         App app = new App();
@@ -23,57 +31,31 @@ public class App {
 
         while (running) {
 
-        System.out.println(SEPERATOR);
-        System.out.println("Hello! What would you like to do? Type help if you need help");
-        String userTask = inputScanner.nextLine().toUpperCase(); 
-        
-        for (int i = 0; i < validCMD.length ; i++) {
-            
-            if (validCMD[i].equals(userTask)) {
+            System.out.println(SEPERATOR);
+            System.out.println("Hello! What would you like to do? Type help if you need help");
+            String userInput = inputScanner.nextLine().toUpperCase(); 
 
-                switch (userTask) {
-                    case "HELP":
-                        helpMenu();
-                        break;
-                    case "USER":
-                    /* 
-                    die idee ist dass man sich einloggen kann (möglichkeit mit hash zu arbeiten o.ä)
-                    um mehrere listen und datein für mehrer nutzer hat (gast user als standard)
-                    */
-                        System.out.println("WIP");
-                        break;
-                    case "CREATE":
-                        createTask();
-                        fileIO.exportList(toDoList);
-                        break;
-                    case "DELETE":
-                        deleteTask();
-                        fileIO.exportList(toDoList);
-                        running = continueCheck();
-                        break;  
-                    case "SHOW":
-                        showList();
-                        running = continueCheck();
-                        break;   
-                    case "EXIT":
-                        // exit program
-                        // cleanup not needed since cleanup happens after 
-                        // switch but before while loop ends
-                        System.out.println("Goodbye");
-                        running = false;
-                        break;     
-                    default:
-                        break;
+            Command command;
+
+            try {
+                command = Command.valueOf(userInput);
+            } catch (IllegalArgumentException e) {
+                command = null;
+            }
+
+            switch (command) {
+                case HELP -> helpMenu();
+                case USER -> System.out.println("WIP");
+                case CREATE -> createTask();
+                case DELETE -> deleteTask();
+                case SHOW -> showList();
+                case EXIT -> running = false;
+                default -> {
+                    System.out.println("Sorry I can't help you with that.");
+                    running = continueCheck();
                 }
-                break;
-            }else if (i == validCMD.length-1) {
-                //if command not recognized will run again
-                System.out.println("Sorry I can't help you with that.");
-                running = continueCheck();
-            } 
+            }
         }
-        }
-
         //cleanup before exit
         inputScanner.close();
         fileIO.exportList(toDoList);
@@ -88,18 +70,6 @@ public class App {
         while (iterator.hasNext()) {
             System.out.println(i + ". " + iterator.next());
             i++;
-        }
-    }
-
-    // method to delete all tasks with the given description from the to-do list
-    // might delete multiple tasks if they share the same description
-    // todo: give each task a unique ID to delete specific tasks
-    public void deleteFromList(String removeable){
-        boolean removed = toDoList.removeIf(task -> task.getDescription().equals(removeable));
-        if (removed) {
-            System.out.println("Deleted  " + removeable + "  successfully");
-        } else {
-            System.out.println("Task not found: " + removeable);
         }
     }
 
@@ -133,9 +103,15 @@ public class App {
     }
 
     public void deleteTask() {
+        showList();
         System.out.println("Please enter the description of the task you want to delete:");
         String description = inputScanner.nextLine();
-        deleteFromList(description);
+        boolean removed = toDoList.removeIf(task -> task.getDescription().equals(description));
+        if (removed) {
+            System.out.println("Deleted  " + description + "  successfully");
+        } else {
+            System.out.println("Task not found: " + description);
+        }
     }
 
 }
