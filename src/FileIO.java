@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class FileIO {
@@ -21,43 +23,49 @@ public FileIO() {
 // import the to-do list from the data file
 // format: description;owner;isCompleted
 // split by semicolon and parse accordingly
-public void importList(){
+public List<Task> importList(){
+  List<Task> importedList = new ArrayList<>();
+
      try {
       Scanner myReader = new Scanner(dataFile);
+
       while (myReader.hasNextLine()) {
         String data = myReader.nextLine();
         String[] parts = data.split(";");
         String description = parts[0];
         String owner = parts[1];
         boolean isCompleted = Boolean.parseBoolean(parts[2]);
-
-        // todo: disconnect FileIO from App class
-        App.toDoList.add(new Task(description, owner, isCompleted));
+        Task task = new Task(description, owner, isCompleted);
+        importedList.add(task);
       }
       myReader.close();
+
     } catch (Exception e) {
         ensureDataFileExists();
         System.out.println("File not found. A new file has been created.");
-      }
+        e.printStackTrace();
+    }
+
+  return importedList;
 }
 
 // export the to-do list to the data file
 // format: description;owner;isCompleted
 // separated by semicolon and parsed accordingly
-public void exportList(){ 
+public void exportList(List<Task> exportedList) { 
   ensureDataFileExists();
   try {
       FileWriter myWriter = new FileWriter(dataFile.toFile());
 
-      for (int i = 0; i < App.toDoList.size(); i++) {
+      for (int i = 0; i < exportedList.size(); i++) {
         myWriter.write(
-          App.toDoList.get(i).getDescription() + ";" + 
-          App.toDoList.get(i).getOwner() + ";" + 
-          App.toDoList.get(i).isCompleted() +
+          exportedList.get(i).getDescription() + ";" + 
+          exportedList.get(i).getOwner() + ";" + 
+          exportedList.get(i).isCompleted() +
           System.lineSeparator());
       }
       myWriter.close();
-      System.out.println("Successfully wrote to the file.");
+      System.out.println("## Successfully wrote to the file. ##");
     } catch (IOException e) {
       System.out.println("An error occurred while writing to the file.");
       e.printStackTrace();

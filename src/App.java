@@ -1,17 +1,19 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
 
     public static String[] validCMD = {"HELP","USER","CREATE","DELETE","SHOW","EXIT"};
-    public static ArrayList<Task> toDoList = new ArrayList<>();
+    public static List<Task> toDoList = new ArrayList<>();
     static String SEPERATOR = "#################################################################";
     static Scanner inputScanner = new Scanner(System.in);
 
     public static void main(String[] args) throws Exception {
+
         FileIO fileIO = new FileIO();
-        fileIO.importList();
+        toDoList = fileIO.importList();
         
         boolean running = true;
 
@@ -43,7 +45,7 @@ public class App {
                     case "CREATE":
                         //create blank task, ask for description and owner, add to list
                         Task newTask = new Task("","",false); //placeholder
-                        System.out.println("Sure! Please enter the Name of your task.");
+                        System.out.println("Sure! Please enter the description of your task.");
                         String userInputTaskDescription = inputScanner.nextLine();
                         newTask.setDescription(userInputTaskDescription);
                         System.out.println("Please enter the Owner of the task.");
@@ -79,11 +81,11 @@ public class App {
 
                         // displays list with numbering so maybe user could select via number 
                         // instead of description
-                        System.out.println("Sure! Which following task would you like to delete?");
+                        System.out.println("Sure! Which following task would you like to delete? (select via description)");
                         showList();
                         String userInputDelete = inputScanner.nextLine();
                         deleteFromList(userInputDelete);
-                        fileIO.exportList();
+                        fileIO.exportList(toDoList);
                         running = continueCheck();
                         break;  
 
@@ -115,7 +117,7 @@ public class App {
 
     //cleanup before exit
     inputScanner.close();
-    fileIO.exportList();
+    fileIO.exportList(toDoList);
     }
 
     // method to show the to-do list using an iterator
