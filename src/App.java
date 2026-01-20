@@ -3,126 +3,130 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Main application class for a console-based To-Do list manager.
+ * <p>
+ * This class provides a command-line interface (CLI) for users to manage tasks.
+ * Tasks can be created, displayed, and deleted. The application supports
+ * persisting tasks to a file through the FileIO class.
+ * <p>
+ * The application is designed to be simple yet extendable for future functionality,
+ * e.g., user management (USER command is currently WIP).
+ * 
+ * Key features:
+ * - Command-based interface with HELP, CREATE, DELETE, SHOW, USER, EXIT commands.
+ * - Tasks are stored in memory as a List of Task objects.
+ * - Tasks are persisted between sessions via file import/export.
+ * - Provides graceful handling of invalid user commands.
+ * - Iterates through tasks using an Iterator to ensure ordered display.
+ * 
+ * Thread safety: This class is not thread-safe and should only be used in a single-threaded context.
+ */
 public class App {
 
-    public static String[] validCMD = {"HELP","USER","CREATE","DELETE","SHOW","EXIT"};
-    public static List<Task> toDoList = new ArrayList<>();
-    static String SEPERATOR = "#################################################################";
-    static Scanner inputScanner = new Scanner(System.in);
+    /**
+     * In-memory list storing all tasks.
+     * Uses ArrayList for efficient sequential access and iteration.
+     */
+    private List<Task> toDoList = new ArrayList<>();
 
-    public static void main(String[] args) throws Exception {
+    /**
+     * Scanner instance used for reading user input from the console.
+     * Initialized once to avoid resource leaks.
+     */
+    private final Scanner inputScanner = new Scanner(System.in);
 
-        FileIO fileIO = new FileIO();
-        toDoList = fileIO.importList();
-        
-        boolean running = true;
+    /**
+     * Instance of FileIO for persisting tasks to and from a file.
+     */
+    private final FileIO fileIO = new FileIO();
 
-        while (running) {
-
-        System.out.println(SEPERATOR);
-        System.out.println("Hello! What would you like to do? Type help if you need help");
-        String userTask = inputScanner.nextLine().toUpperCase(); 
-        
-        for (int i = 0; i < validCMD.length ; i++) {
-            
-            if (validCMD[i].equals(userTask)) {
-
-                switch (userTask) {
-                    case "HELP":
-                        System.out.println("Sure! Let me show you your possible commands: ");
-                        for (int j = 0; j < validCMD.length; j++) {
-                            System.out.println(validCMD[j]);
-                        }
-                        running = continueCheck();
-                        break;
-                    case "USER":
-                    /* 
-                    die idee ist dass man sich einloggen kann (möglichkeit mit hash zu arbeiten o.ä)
-                    um mehrere listen und datein für mehrer nutzer hat (gast user als standard)
-                    */
-                        System.out.println("WIP");
-                        break;
-                    case "CREATE":
-                        //create blank task, ask for description and owner, add to list
-                        Task newTask = new Task("","",false); //placeholder
-                        System.out.println("Sure! Please enter the description of your task.");
-                        String userInputTaskDescription = inputScanner.nextLine();
-                        newTask.setDescription(userInputTaskDescription);
-                        System.out.println("Please enter the Owner of the task.");
-                        String userInputTaskOwner = inputScanner.nextLine();
-                        newTask.setOwner(userInputTaskOwner);
-                        toDoList.add(newTask);
-
-                        //todo: add check if sucessfull added task
-                        //todo: unique IDs for tasks
-
-                        /* 
-                        for (int j = 0; j < toDoList.size(); j++) {
-                            if (toDoList.get(j).equals(userInputTaskDescription) ) {
-                                System.out.println("Succesfully added: " + toDoList.get(j));
-                                fileIO.exportList();
-                            }else if (j == toDoList.size()-1) {
-                                System.out.println("Ups seems like there was a problem...");
-                            }
-                        }
-                            */
-                        //frag ob man noch mehr erstellen will
-                        running = continueCheck();
-                        break;
-
-                    case "DELETE":
-                        // show list, ask which one to delete, delete from list
-                        // currently selecting via description, might delete multiple if same description
-
-                        // todo: unique IDs for tasks
-                        // todo: confirm before delete
-                        // todo: ask if wanting to delete more
-                        // inspiration: delete all completed tasks option
-
-                        // displays list with numbering so maybe user could select via number 
-                        // instead of description
-                        System.out.println("Sure! Which following task would you like to delete? (select via description)");
-                        showList();
-                        String userInputDelete = inputScanner.nextLine();
-                        deleteFromList(userInputDelete);
-                        fileIO.exportList(toDoList);
-                        running = continueCheck();
-                        break;  
-
-                    case "SHOW":
-                        // display all tasks
-                        // todo: sort options (owner, completed, etc)
-                        System.out.println("Sure! Let me show you your to-do's:");
-                        showList();
-                        running = continueCheck();
-                        break;   
-                    case "EXIT":
-                        // exit program
-                        // cleanup not needed since cleanup happens after 
-                        // switch but before while loop ends
-                        System.out.println("Goodbye");
-                        running = false;
-                        break;     
-                    default:
-                        break;
-                }
-                break;
-            }else if (i == validCMD.length-1) {
-                //if command not recognized will run again
-                System.out.println("Sorry I can't help you with that.");
-                running = continueCheck();
-            } 
-        }
-        }
-
-    //cleanup before exit
-    inputScanner.close();
-    fileIO.exportList(toDoList);
+    /**
+     * Enumeration defining the set of valid commands the user can execute.
+     */
+    public enum Command {
+        HELP,   // Show available commands
+        USER,   // Placeholder for user management (WIP)
+        CREATE, // Create a new task
+        DELETE, // Delete an existing task
+        SHOW,   // Display all tasks
+        EXIT    // Exit the application
     }
 
-    // method to show the to-do list using an iterator
-    // order depends on when tasks were added (1. is oldest)
-    public static void showList(){
+    /**
+     * Visual separator used for enhancing console readability.
+     */
+    private static final String SEPARATOR = "#################################################################";
+
+    /**
+     * Entry point for the application.
+     *
+     * @param args command-line arguments (not used)
+     * @throws Exception if file import/export fails
+     */
+    public static void main(String[] args) throws Exception {
+        App app = new App();
+        app.run();
+    }
+
+    /**
+     * Main application loop.
+     * <p>
+     * This method initializes the to-do list from file storage,
+     * prompts the user for commands, executes the corresponding actions,
+     * and persists any changes before exiting.
+     *
+     * @throws Exception if file operations fail
+     */
+    public void run() throws Exception {
+
+        // Load previously saved tasks from file
+        toDoList = fileIO.importList();
+
+        boolean running = true;
+
+        // Main command loop
+        while (running) {
+            System.out.println(SEPARATOR);
+            System.out.println("Hello! What would you like to do? Type help if you need help");
+            String userInput = inputScanner.nextLine().toUpperCase();
+
+            Command command;
+
+            // Attempt to parse the user input into a Command enum
+            try {
+                command = Command.valueOf(userInput);
+            } catch (IllegalArgumentException e) {
+                command = null; // Invalid command
+            }
+
+            // Execute action based on the parsed command
+            switch (command) {
+                case HELP -> helpMenu();
+                case USER -> System.out.println("WIP"); // Placeholder for future user management
+                case CREATE -> createTask();
+                case DELETE -> deleteTask();
+                case SHOW -> showList();
+                case EXIT -> running = false;
+                default -> {
+                    // Handle invalid or unrecognized commands
+                    System.out.println("Sorry I can't help you with that.");
+                    running = continueCheck();
+                }
+            }
+        }
+
+        // Cleanup resources and save tasks to file before exiting
+        inputScanner.close();
+        fileIO.exportList(toDoList);
+    }
+
+    /**
+     * Displays the current to-do list in the order tasks were added.
+     * Uses an iterator for traversal to demonstrate standard Java iteration patterns.
+     */
+    public void showList() {
+        System.out.println("Sure! Let me show you your to-do's:");
         Iterator<Task> iterator = toDoList.iterator();
         int i = 1;
         while (iterator.hasNext()) {
@@ -131,25 +135,65 @@ public class App {
         }
     }
 
-    // method to delete all tasks with the given description from the to-do list
-    // might delete multiple tasks if they share the same description
-    // todo: give each task a unique ID to delete specific tasks
-    public static void deleteFromList(String removeable){
-        boolean removed = toDoList.removeIf(task -> task.getDescription().equals(removeable));
-        if (removed) {
-            System.out.println("Deleted  " + removeable + "  successfully");
-        } else {
-            System.out.println("Task not found: " + removeable);
-        }
-    }
-
-    // method to ask the user if they want to continue
-    // user will start over if they type Y, otherwise the program will exit
-    public static boolean continueCheck() {
+    /**
+     * Prompts the user to decide whether to continue after an unrecognized command.
+     *
+     * @return true if the user wants to continue, false to exit
+     */
+    public boolean continueCheck() {
         System.out.println("Would you like to continue? Y/N");
         String answer = inputScanner.nextLine().trim().toUpperCase();
-
         return answer.equals("Y");
     }
 
+    /**
+     * Displays all available commands to the user.
+     * Enumerates the Command enum to ensure automatic updates if commands are added or removed.
+     */
+    public void helpMenu() {
+        System.out.println("Sure! Let me show you your possible commands: ");
+        for (Command cmd : Command.values()) {
+            System.out.println(cmd);
+        }
+    }
+
+    /**
+     * Creates a new Task object based on user input and adds it to the to-do list.
+     * Prompts the user for a task description and owner.
+     * Persists the updated list to file immediately.
+     */
+    public void createTask() {
+        System.out.println("Let's create a new task!");
+        System.out.println("Please enter the task description:");
+        String description = inputScanner.nextLine();
+
+        System.out.println("Please enter the task owner:");
+        String owner = inputScanner.nextLine();
+
+        Task newTask = new Task(description, owner, false);
+        toDoList.add(newTask);
+        fileIO.exportList(toDoList);
+        System.out.println("Task created successfully: " + newTask);
+    }
+
+    /**
+     * Deletes a task from the to-do list by matching the task description.
+     * Shows the current list, asks for the task description to delete,
+     * and updates file storage upon successful deletion.
+     */
+    public void deleteTask() {
+        showList();
+        System.out.println("Please enter the description of the task you want to delete:");
+        String description = inputScanner.nextLine();
+
+        // Remove task(s) matching the description
+        boolean removed = toDoList.removeIf(task -> task.getDescription().equals(description));
+
+        if (removed) {
+            fileIO.exportList(toDoList);
+            System.out.println("Deleted  " + description + "  successfully");
+        } else {
+            System.out.println("Task not found: " + description);
+        }
+    }
 }
