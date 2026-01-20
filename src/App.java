@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Scanner;
 
 public class App {
-    public List<Task> toDoList = new ArrayList<>();
-    public static Scanner inputScanner = new Scanner(System.in);
+    private List<Task> toDoList = new ArrayList<>();
+    private final Scanner inputScanner = new Scanner(System.in);
+    private final FileIO fileIO = new FileIO();
     public enum Command {
         HELP,
         USER,
@@ -14,7 +15,7 @@ public class App {
         SHOW,
         EXIT
     }
-    public static String SEPERATOR = "#################################################################";
+    private static String SEPERATOR = "#################################################################";
 
     public static void main(String[] args) throws Exception {
         App app = new App();
@@ -22,7 +23,7 @@ public class App {
     }
        
     public void run() throws Exception {
-        FileIO fileIO = new FileIO();
+        
         toDoList = fileIO.importList();
         
         boolean running = true;
@@ -42,7 +43,7 @@ public class App {
             }
 
             switch (command) {
-                case HELP -> helpMenu(command);
+                case HELP -> helpMenu();
                 case USER -> System.out.println("WIP");
                 case CREATE -> createTask();
                 case DELETE -> deleteTask();
@@ -80,7 +81,7 @@ public class App {
         return answer.equals("Y");
     }
 
-    public void helpMenu(Command command) {
+    public void helpMenu() {
         System.out.println("Sure! Let me show you your possible commands: ");
         for (Command cmd : Command.values()) {
             System.out.println(cmd);
@@ -97,7 +98,9 @@ public class App {
 
         Task newTask = new Task(description, owner, false);
         toDoList.add(newTask);
+        fileIO.exportList(toDoList);
         System.out.println("Task created successfully: " + newTask);
+        
     }
 
     public void deleteTask() {
@@ -106,6 +109,7 @@ public class App {
         String description = inputScanner.nextLine();
         boolean removed = toDoList.removeIf(task -> task.getDescription().equals(description));
         if (removed) {
+            fileIO.exportList(toDoList);
             System.out.println("Deleted  " + description + "  successfully");
         } else {
             System.out.println("Task not found: " + description);
