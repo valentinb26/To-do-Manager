@@ -5,9 +5,7 @@ import java.util.Scanner;
 
 public class App {
     public List<Task> toDoList = new ArrayList<>();
-    static Scanner inputScanner = new Scanner(System.in);
-
-    public static String[] validCMD = {"HELP","USER","CREATE","DELETE","SHOW","EXIT"};
+    public static Scanner inputScanner = new Scanner(System.in);
     public enum Command {
         HELP,
         USER,
@@ -16,7 +14,7 @@ public class App {
         SHOW,
         EXIT
     }
-    static String SEPERATOR = "#################################################################";
+    public static String SEPERATOR = "#################################################################";
 
     public static void main(String[] args) throws Exception {
         App app = new App();
@@ -44,7 +42,7 @@ public class App {
             }
 
             switch (command) {
-                case HELP -> helpMenu();
+                case HELP -> helpMenu(command);
                 case USER -> System.out.println("WIP");
                 case CREATE -> createTask();
                 case DELETE -> deleteTask();
@@ -82,10 +80,10 @@ public class App {
         return answer.equals("Y");
     }
 
-    public void helpMenu() {
+    public void helpMenu(Command command) {
         System.out.println("Sure! Let me show you your possible commands: ");
-        for (int j = 0; j < validCMD.length; j++) {
-            System.out.println(validCMD[j]);
+        for (Command cmd : Command.values()) {
+            System.out.println(cmd);
         }
     }
 
