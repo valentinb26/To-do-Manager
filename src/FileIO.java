@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -12,8 +13,8 @@ public class FileIO {
 public FileIO() {
   this.dataDirectory = Paths.get(
       System.getProperty("user.home"),
-      "to-do-manager",
-      "data"
+      "To-do-manager",
+      "Data"
   );
   this.dataFile = dataDirectory.resolve("todoList.txt");
     }
@@ -64,27 +65,14 @@ public void exportList(){
 
 public void CreateFile() {
   try {
-    File directory = new File(dataDirectory.toString());
-    if (directory.mkdir()) {
-      System.out.println("Directory created: " + directory.getName());
-    } else {
-      System.out.println("Directory exists or could not be created.");
+    Files.createDirectories(dataDirectory);
+    if (Files.notExists(dataFile)) {
+        Files.createFile(dataFile);
     }
   } catch (Exception e) {
     System.out.println("An error occurred while creating the directory.");
     e.printStackTrace();
   }
-  try {
-    File myObj = new File(dataFile.toString());
-    if (myObj.createNewFile()) {
-      System.out.println("File created: " + myObj.getName());
-    } else {
-      System.out.println("File exists.");
-      }
-    } catch (Exception e) {
-      System.out.println("An error occurred while creating the file.");
-      e.printStackTrace();
-    }
   }
 
 }
